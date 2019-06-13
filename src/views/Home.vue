@@ -1,0 +1,82 @@
+<template>
+  <div id="app">
+    <div class="container">
+      <AddTodo v-on:add-todo="addTodo"/>
+      <FilterTodos />
+      <Todos v-bind:todos="todos" v-on:del-todo="deleteTodo" />
+    </div>
+  </div>
+</template>
+
+<script>
+import Todos from '../components/Todos';
+import AddTodo from '../components/AddTodo';
+import FilterTodos from '../components/FilterTodos';
+import { runInThisContext } from 'vm';
+import axios from 'axios';
+
+export default {
+  name: 'home',
+  components: {
+    AddTodo,
+    FilterTodos,
+    Todos
+  },
+  data() {
+    return {
+      todos: []
+    }
+  },
+  methods: {
+    addTodo(newTodo) {
+      const { title, completed } = newTodo;
+
+      axios.post('https://jsonplaceholder.typicode.com/todos',
+        {
+          title,
+          completed
+        }
+      )
+        .then(res => this.todos = [...this.todos, res.data])
+        .catch(err => console.log(err));
+    },
+
+    deleteTodo(id) {
+      axios.delete(`https://jsonplaceholder.typicode.com/todos/${id}`)
+        .then(res => this.todos = this.todos.filter(todo => todo.id !== id))
+        .catch(err => console.log(err));
+    }
+  },
+  created() {
+    axios.get('https://jsonplaceholder.typicode.com/todos?_limit=5')
+      .then(res => this.todos = res.data  )
+      .catch(err => console.log(err));
+  }
+}
+</script>
+
+<style>
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: Arial, helvetica, sans-serif;
+    line-height: 1.4;
+  }
+
+  .btn {
+    display: inline-block;
+    background: #555;    
+    border: none;
+    color: #fff;
+    padding: 7px 20px;
+    cursor: pointer;
+  }
+
+  .btn:hover {
+    background: #666;
+  }
+</style>
