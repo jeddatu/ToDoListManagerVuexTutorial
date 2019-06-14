@@ -56,7 +56,6 @@ const actions = {
       updToDo
     );
 
-    console.log(response);
     commit("updateTodo", response.data);
   }
 };
